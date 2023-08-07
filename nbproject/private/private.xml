@@ -3,11 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/View/VentanaInicio.java</file>
+            <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/Model/Pedido.java</file>
             <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/Controllers/IngredienteController.java</file>
+            <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/Model/Taco.java</file>
             <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/View/VentanaPedido.java</file>
             <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/Controllers/TacoController.java</file>
             <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/View/VentanaIngrediente.java</file>
-            <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/DAO/ingredienteDao.java</file>
+            <file>file:/C:/Users/Sistema/Documents/NetBeansProjects/Tacotito/src/Controllers/PedidoController.java</file>
         </group>
     </open-files>
 </project-private>

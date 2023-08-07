@@ -254,4 +254,8 @@ public class IngredienteController {
             throw new SQLException("Ingrediente no encontrado con el ID: " + id);
         }
     }
+    
+   
+
+
 }

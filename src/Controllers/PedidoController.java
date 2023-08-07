@@ -10,9 +10,11 @@ public class PedidoController {
     private static PedidoController instancia;
 
     private int numeroPedidoActual = 1;
-    private List<Pedido> listaPedido = new ArrayList<>(); 
+    private List<Pedido> listaPedido;
 
-
+    public PedidoController(){
+        listaPedido = new ArrayList<>(); 
+    }
     public static PedidoController obtenerInstancia() {
         if (instancia == null) {
             instancia = new PedidoController();
@@ -28,7 +30,7 @@ public class PedidoController {
         return nuevoPedido;
     }
 
-    private int calcularPrecioTotalPedido(List<Taco> listaTacos) {
+    public int calcularPrecioTotalPedido(List<Taco> listaTacos) {
         int precioTotal = 0;
         for (Taco taco : listaTacos) {
             precioTotal += taco.getPrecioTotal();
@@ -38,46 +40,41 @@ public class PedidoController {
 
     
       
-   public Taco calcularTacoMasCaro() {
+   public int calcularTacoMasCaro(List<Taco> listaTacos) {
     Taco tacoMasCaro = null;
-    int maxPrecio = Integer.MIN_VALUE;
-    for (Pedido pedido : listaPedido) {
-        for (Taco taco : pedido.getTacos()) {
-            System.out.println("Taco: " + taco.getNumeroTaco() + ", Precio: " + taco.getPrecioTotal());
-            if (taco.getPrecioTotal() > maxPrecio) {
+    int maxPrecio = 0;
+        for(Taco taco:listaTacos){
+            if(taco.getPrecioTotal()>maxPrecio){
                 maxPrecio = taco.getPrecioTotal();
-                tacoMasCaro = taco;
+                tacoMasCaro=taco;
             }
+        
         }
-    }
-    return tacoMasCaro;
+    
+    return tacoMasCaro.getNumeroTaco();
 }
 
 
-    public int calcularTacoMasEconomico() {
-        int minPrecio = Integer.MIN_VALUE;
-        for (Pedido pedido : listaPedido) {
-            for (Taco taco : pedido.getTacos()) {
-                if (taco.getPrecioTotal() < minPrecio) {
-                    minPrecio = taco.getPrecioTotal();
-                }
+    public int calcularTacoMasEconomico(List<Taco> listaTacos) {
+        Taco tacoMasEco= null;
+        int minPrecio = Integer.MAX_VALUE;
+           for(Taco taco:listaTacos){
+            if(taco.getPrecioTotal()<minPrecio){
+                minPrecio = taco.getPrecioTotal();
+                tacoMasEco=taco;
             }
         }
-        return minPrecio;
-    }
-
-    public int calcularTacoPromedio() {
-        int totalTacos = 0;
-        int totalPrecio = 0;
-        for (Pedido pedido : listaPedido) {
-            for (Taco taco : pedido.getTacos()) {
-                totalTacos++;
-                totalPrecio += taco.getPrecioTotal();
-            }
-        }
-        return totalTacos > 0 ? totalPrecio / totalTacos : 0;
-    }
-   
+    
+    return tacoMasEco.getNumeroTaco();
 }
+    public int cantTacos(){
+       return listaPedido.size();
+    }
+    public double calcularTacoPromedio(List<Taco> listaTacos) {
+       return calcularPrecioTotalPedido(listaTacos)/ listaTacos.size();
+      
+    }
+}
+
 
 

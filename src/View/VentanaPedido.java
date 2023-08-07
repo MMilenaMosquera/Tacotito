@@ -13,16 +13,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
 import javax.swing.table.DefaultTableModel;
 
 public class VentanaPedido extends javax.swing.JFrame {
-    
+
     private List<Ingrediente> ingredientesSeleccionados = new ArrayList<>();
     private List<Taco> listaTacos = new ArrayList<>();
-    private int precioTotalPedido =0; 
 
     public VentanaPedido() throws SQLException {
         initComponents();
@@ -350,25 +346,33 @@ public class VentanaPedido extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnFinalizarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalizarPedidoActionPerformed
-     
-        Pedido pedido = pedidoController.crearPedido(listaTacos);
-        System.out.println(pedido); 
-        JOptionPane.showMessageDialog(null, "Pedido:" + pedido.getNumeroPedido() +"Precio Total: " + pedido.getPrecioTotalPedido(), "Mensaje", JOptionPane.INFORMATION_MESSAGE);
 
+        try {
+            Pedido pedido = pedidoController.crearPedido(listaTacos);
+            System.out.println(pedido);
+            limpiarTablasYCombos();
+            JOptionPane.showMessageDialog(null, "Pedido:" + pedido.getNumeroPedido() + "Precio Total: " + pedido.getPrecioTotalPedido(), "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
 
+            VentanaInicio ventanaInicio = new VentanaInicio();
+            ventanaInicio.setVisible(true);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(VentanaPedido.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnFinalizarPedidoActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
 
         try {
-            Taco taco = controllerT.cargarTaco(ingredientesSeleccionados, calcularPrecioTotal());
+            Taco taco = controllerT.cargarTaco(ingredientesSeleccionados);
             listaTacos.add(taco);
             System.out.println(taco);
-            precioTotalPedido += taco.getPrecioTotal();
-            txtPrecioTotalPedido.setText(String.valueOf(precioTotalPedido));
-
-
             agregarTacoATablaPedidos();
+            txtPrecioTotalPedido.setText(String.valueOf(calcularPrecioTotalPedido()));
+            txtTacoMasCaro.setText(String.valueOf(calcularTacoMasCaro()));
+            txtTacoMasEconomico.setText(String.valueOf(calcularTacoMasEconomico()));
+            txtTacoPromedio.setText(String.valueOf(calcularTacoProm()));
             limpiarTablaIngredientesYCombos();
 
         } catch (SQLException ex) {
@@ -377,6 +381,7 @@ public class VentanaPedido extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void cmboxTortillaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmboxTortillaActionPerformed
+        
         if (cmboxTortilla.getSelectedIndex() != 0) {
             String nombreTortilla = cmboxTortilla.getSelectedItem().toString();
             Ingrediente ingredienteTortilla;
@@ -420,18 +425,10 @@ public class VentanaPedido extends javax.swing.JFrame {
             }
         }
      }//GEN-LAST:event_cmbSalsaActionPerformed
-
-
-
-   
-  
-
     private void CargarComboXtipoIngrediente() throws SQLException {
         List<Ingrediente> listaIngredientes = controller.listarIngredientes();
-
         for (Ingrediente ingrediente : listaIngredientes) {
             TipoIngrediente tipoIngrediente = controller.buscarTipoIngredientePorId(ingrediente.getTipoIngrediente().getIdTipoIngrediente());
-
             if (tipoIngrediente != null) {
                 String nombreIngrediente = ingrediente.getNombreIngrediente();
                 if (nombreIngrediente != null && !nombreIngrediente.isEmpty()) {
@@ -451,13 +448,11 @@ public class VentanaPedido extends javax.swing.JFrame {
         }
         cmbSalsa.insertItemAt("Seleccione una salsa", 0);
         cmbSalsa.setSelectedIndex(0);
-
         cmbAlimento.insertItemAt("Seleccione un alimento", 0);
         cmbAlimento.setSelectedIndex(0);
-
         cmboxTortilla.insertItemAt("Seleccione una tortilla", 0);
         cmboxTortilla.setSelectedIndex(0);
-        }
+    }
 
     private void agregarIngredienteALista(Ingrediente ingrediente) {
         if (ingrediente != null) {
@@ -507,14 +502,27 @@ public class VentanaPedido extends javax.swing.JFrame {
         }
     }
 
+    
     private int calcularPrecioTotal() throws SQLException {
-        int total = 0;
-        for (Ingrediente ingrediente : ingredientesSeleccionados) {
-            total += controller.precioIng(ingrediente.getId());
-        }
+        int total = controllerT.calcularPrecioTotal(ingredientesSeleccionados);
         return total;
     }
-
+     private int calcularPrecioTotalPedido() throws SQLException {
+         int total = pedidoController.calcularPrecioTotalPedido(listaTacos);
+        return total;
+    }
+     private int calcularTacoMasCaro(){
+         int tacoMasCaro = pedidoController.calcularTacoMasCaro(listaTacos);
+         return tacoMasCaro;
+     }
+     private int calcularTacoMasEconomico(){
+         int tacoMasEco = pedidoController.calcularTacoMasEconomico(listaTacos);
+         return tacoMasEco;
+     }
+     private double calcularTacoProm(){
+         double tacoProm = pedidoController.calcularTacoPromedio(listaTacos);
+         return tacoProm;
+     }
     private String obtenerNombresIngredientes(List<Ingrediente> ingredientes) {
         StringBuilder nombres = new StringBuilder();
         for (Ingrediente ingrediente : ingredientes) {
@@ -526,18 +534,22 @@ public class VentanaPedido extends javax.swing.JFrame {
         return nombres.toString();
     }
 
-private void limpiarTablaIngredientesYCombos() throws SQLException {
-    DefaultTableModel tabla = (DefaultTableModel) tablaIng.getModel();
-    tabla.setRowCount(0);
-
-    cmbSalsa.setSelectedIndex(0);
-    cmbAlimento.setSelectedIndex(0);
-    cmboxTortilla.setSelectedIndex(0);
-
-    ingredientesSeleccionados.clear();
-
-    mostrarIngredientesEnTabla();
-}
+    private void limpiarTablaIngredientesYCombos() throws SQLException {
+        cmbSalsa.setSelectedIndex(0);
+        cmbAlimento.setSelectedIndex(0);
+        cmboxTortilla.setSelectedIndex(0);
+        ingredientesSeleccionados.clear();
+        mostrarIngredientesEnTabla();
+    }
+     private void limpiarTablasYCombos() throws SQLException {
+        cmbSalsa.setSelectedIndex(0);
+        cmbAlimento.setSelectedIndex(0);
+        cmboxTortilla.setSelectedIndex(0);
+        ingredientesSeleccionados.clear();
+        listaTacos.clear();
+        mostrarIngredientesEnTabla();
+        agregarTacoATablaPedidos();    
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;

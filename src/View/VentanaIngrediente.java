@@ -58,6 +58,7 @@ public class VentanaIngrediente extends javax.swing.JFrame {
         btnEliminar = new javax.swing.JButton();
         btnAgregar = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -295,6 +296,13 @@ public class VentanaIngrediente extends javax.swing.JFrame {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
+        jButton1.setText("Volver al Inicio");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -309,6 +317,10 @@ public class VentanaIngrediente extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(panelDatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(49, 49, 49))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -319,7 +331,8 @@ public class VentanaIngrediente extends javax.swing.JFrame {
                     .addComponent(panelBotones, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(panelDatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30))
+                .addGap(1, 1, 1)
+                .addComponent(jButton1))
         );
 
         lblNombreIngrediente.getAccessibleContext().setAccessibleName("Datos");
@@ -393,6 +406,7 @@ public class VentanaIngrediente extends javax.swing.JFrame {
 
                 DefaultTableModel model = (DefaultTableModel) tableIng.getModel();
                 model.removeRow(fila);
+                limpiarComponentes();
 
                 JOptionPane.showMessageDialog(null, "Ingrediente eliminado correctamente.");
             }
@@ -405,21 +419,37 @@ public class VentanaIngrediente extends javax.swing.JFrame {
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         this.btnAgregar.setEnabled(false);
         this.btnGuardar.setEnabled(true);
-        habilitarComponentes();
+        
+        
 
         int fila = tableIng.getSelectedRow();
-        String nombre, precio;
+        String tIng, nombre, precio;
         if (fila >= 0) {
-            nombre = tableIng.getValueAt(fila, 2).toString();
-            precio = tableIng.getValueAt(fila, 3).toString();
-
-            txtIngrediente.setText(nombre);
-            txtPrecio.setText(precio);
+            try {
+                tIng = tableIng.getValueAt(fila, 1).toString();
+                System.out.println(tIng);
+                nombre = tableIng.getValueAt(fila, 2).toString();
+                precio = tableIng.getValueAt(fila, 3).toString();
+                
+                txtIngrediente.setText(nombre);
+                txtPrecio.setText(precio);
+                cmbTipoIng.setSelectedItem(tIng);
+                llenarTipoIngr();
+                habilitarComponentes();
+            } catch (SQLException ex) {
+                Logger.getLogger(VentanaIngrediente.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
         } else {
             JOptionPane.showMessageDialog(null, "No ha seleccionado ningun ingrediente");
         }
     }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        this.dispose();     
+        VentanaInicio ventanaInicio = new VentanaInicio();
+        ventanaInicio.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * método llenar campos que trae de la base de datos los tipos de
@@ -438,8 +468,10 @@ public class VentanaIngrediente extends javax.swing.JFrame {
      * Método para llenar la tabla con los ingredientes cargados. Pero no me devuelve los datos en la vista, no encuentro en qué está el error.
      */
     private void cargarTabla() throws SQLException {
-         DefaultTableModel tabla = (DefaultTableModel) tableIng.getModel();
+        DefaultTableModel tabla = (DefaultTableModel) tableIng.getModel();
         tableIng.setModel(tabla);
+        tabla.setRowCount(0); // Limpiar la tabla
+
         ArrayList<Ingrediente> lista = (ArrayList<Ingrediente>) controller.listarIngredientes();
         System.out.println(lista.size());
         for (Ingrediente i : lista) {
@@ -465,6 +497,13 @@ public class VentanaIngrediente extends javax.swing.JFrame {
         this.btnGuardar.setEnabled(false);
         this.txtIngrediente.setEnabled(false);
         this.txtPrecio.setEnabled(false);
+        this.btnAgregar.setEnabled(true);
+        this.btnEditar.setEnabled(true);
+        this.btnEliminar.setEnabled(true);
+        this.cmbTipoIng.setEnabled(false);
+        cmbTipoIng.insertItemAt("Seleccione tipo Ingrediente", 0);
+        cmbTipoIng.setSelectedIndex(0);
+       
     }
 
     /**
@@ -474,9 +513,11 @@ public class VentanaIngrediente extends javax.swing.JFrame {
         this.txtIngrediente.setEnabled(true);
         this.txtPrecio.setEnabled(true);
         this.cmbTipoIng.setEnabled(true);
+         cmbTipoIng.insertItemAt("Seleccione tipo Ingrediente", 0);
+         cmbTipoIng.setSelectedIndex(0);
         this.btnGuardar.setEnabled(true);
     }
-
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
@@ -484,6 +525,7 @@ public class VentanaIngrediente extends javax.swing.JFrame {
     private javax.swing.JButton btnEliminar;
     javax.swing.JButton btnGuardar;
     private javax.swing.JComboBox<String> cmbTipoIng;
+    private javax.swing.JButton jButton1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JFrame jFrame2;

@@ -4,6 +4,7 @@ package Controllers;
 import DAO.ingredienteDao;
 import DAO.tipoIngredienteDao;
 import Model.Ingrediente;
+import Model.Pedido;
 import Model.Taco;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,16 +12,16 @@ import java.util.List;
 
 
 public class TacoController {
-    private IngredienteController ingredienteController;
-    private List<Taco> listaTacos; // Agrega una lista de tacos para almacenarlos
-
+    
     private static TacoController instance;
+    private IngredienteController ingredienteController;
+    private List<Taco> listaTacos; 
+    private int numeroTaco = 1; 
 
     public TacoController() throws SQLException {
         ingredienteController = new IngredienteController();
-        listaTacos = new ArrayList<>(); // Inicializa la lista de tacos vacía
+        listaTacos = new ArrayList<>(); 
     }
-
     public static TacoController getInstance() throws SQLException {
         if (instance == null) {
             instance = new TacoController();
@@ -28,16 +29,28 @@ public class TacoController {
         return instance;
     }
 
-    public Taco cargarTaco(List<Ingrediente> ingredientes, int precioTotal) {
-        int numeroTaco = listaTacos.size() + 1; // Asigna un número único a cada taco
-        Taco taco = new Taco(numeroTaco, new ArrayList<>(ingredientes), precioTotal);
-        listaTacos.add(taco); // Agrega el nuevo taco a la lista
-        return taco;
+    public Taco cargarTaco(List<Ingrediente> ingredientes) {
+        int precioTotal = calcularPrecioTotal(ingredientes) ;
+        Taco nuevotaco = new Taco(numeroTaco, ingredientes, precioTotal);
+        listaTacos.add(nuevotaco); 
+        numeroTaco++;
+        return nuevotaco;
     }
 
     public List<Taco> listarTacosConDetalles() {
-        return listaTacos; // Devuelve la lista de tacos almacenados
+        return listaTacos; 
     }
+    
+    public int calcularPrecioTotal(List<Ingrediente> listaIngredientes) {
+        int precioTotal = 0;
+        for (Ingrediente ing : listaIngredientes) {
+            precioTotal += ing.getPrecio();
+        }
+        return precioTotal;
+    }
+    
+    
+    
 }
 
   
